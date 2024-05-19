@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Balance Check",
+    "price": "",
+    "detail": "Our joints need strong muscles to maintain the body's balance",
+    "image": "./bala.png"
+  },
+  {
+    "name": "Flexibility and Mobility",
+    "price": "",
+    "detail": "For efficient movement, our joints need to move through its full range",
+    "image": "./flex.png"
+  },
+  {
+    "name": "Posture",
+    "price": "",
+    "detail": "An altered posture is linked to muscle dysfunction and poor joint position",
+    "image": "./pose.png"
+  },
+  {
+    "name": "Strength and Endurance",
+    "price": "",
+    "detail": "Strong muscles prevent joint injuries and improve endurance as we age",
+    "image": "./stren.png"
+  },
+  {
+    "name": "Functional",
+    "price": "",
+    "detail": "Quality of muscle health to aid daily activities and enhance everyday fitness",
+    "image": "./fun.png"
+  }
+]

@@ -1,0 +1,25 @@
+h2{
+    font-size: 1.5rem;
+    color: #399778;
+    font-weight: bold;
+}
+h1{
+    color: #33D1AB;
+    font-weight: bold;
+}
+.c-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1%;
+  }
+  
+  .c-container div {
+    text-align: center;
+  }
+  
+  @media(max-width:640px) {
+    .c-container{
+     margin-top: 18%;
+    }
+    
+  }
