@@ -272,6 +272,11 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
+"@remix-run/router@1.16.1":
+  version "1.16.1"
+  resolved "https://registry.npmjs.org/@remix-run/router/-/router-1.16.1.tgz"
+  integrity sha512-es2g3dq6Nb07iFxGk5GuHN20RwBZOsuDQN7izWIisUcv9r+d2C5jQxqmgkdebXgReWfiyUabcki6Fg77mSNrig==
+
 "@rollup/plugin-babel@^6.0.3":
   version "6.0.3"
   resolved "https://registry.npmjs.org/@rollup/plugin-babel/-/plugin-babel-6.0.3.tgz"
@@ -911,6 +916,11 @@ path-parse@^1.0.7:
   resolved "https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz"
   integrity sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==
 
+performance-now@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.npmjs.org/performance-now/-/performance-now-2.1.0.tgz"
+  integrity sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow==
+
 picocolors@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/picocolors/-/picocolors-1.0.0.tgz"
@@ -939,7 +949,7 @@ prop-types-exact@^1.2.0:
     object.assign "^4.1.0"
     reflect.ownkeys "^0.2.0"
 
-prop-types@^15.7.2:
+prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -947,6 +957,13 @@ prop-types@^15.7.2:
     loose-envify "^1.4.0"
     object-assign "^4.1.1"
     react-is "^16.13.1"
+
+raf@^3.4.1:
+  version "3.4.1"
+  resolved "https://registry.npmjs.org/raf/-/raf-3.4.1.tgz"
+  integrity sha512-Sq4CW4QhwOHE8ucn6J34MqtZCeWFP2aQSmrlroYgqAV1PjStIhJXxYuTgUIfkEk7zTLjmIjLmU5q+fbD1NnOJA==
+  dependencies:
+    performance-now "^2.1.0"
 
 react-accessible-accordion@^5.0.0:
   version "5.0.0"
@@ -961,7 +978,7 @@ react-countup@^6.4.2:
     "@rollup/plugin-babel" "^6.0.3"
     countup.js "^2.5.0"
 
-"react-dom@^0.14 || >=15", "react-dom@^16.3.3 || ^17.0.0 || ^18.0.0", react-dom@^18.0.0, react-dom@^18.2.0:
+"react-dom@^0.14 || >=15", "react-dom@^16.3.3 || ^17.0.0 || ^18.0.0", "react-dom@^17.x || ^18.x", react-dom@^18.0.0, react-dom@^18.2.0, react-dom@>=16.8:
   version "18.2.0"
   resolved "https://registry.npmjs.org/react-dom/-/react-dom-18.2.0.tgz"
   integrity sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==
@@ -995,7 +1012,22 @@ react-refresh@^0.14.0:
   resolved "https://registry.npmjs.org/react-refresh/-/react-refresh-0.14.0.tgz"
   integrity sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==
 
-react@*, "react@^0.14 || ^15.0.0 || ^16.0.0-alpha", "react@^0.14 || >=15", "react@^16.3.2 || ^17.0.0 || ^18.0.0", react@^18.0.0, react@^18.2.0, "react@>= 16.3.0":
+react-router-dom@^6.23.1:
+  version "6.23.1"
+  resolved "https://registry.npmjs.org/react-router-dom/-/react-router-dom-6.23.1.tgz"
+  integrity sha512-utP+K+aSTtEdbWpC+4gxhdlPFwuEfDKq8ZrPFU65bbRJY+l706qjR7yaidBpo3MSeA/fzwbXWbKBI6ftOnP3OQ==
+  dependencies:
+    "@remix-run/router" "1.16.1"
+    react-router "6.23.1"
+
+react-router@6.23.1:
+  version "6.23.1"
+  resolved "https://registry.npmjs.org/react-router/-/react-router-6.23.1.tgz"
+  integrity sha512-fzcOaRF69uvqbbM7OhvQyBTFDVrrGlsFdS3AL+1KfIBtGETibHzi3FkoTRyiDJnWNc2VxrfvR+657ROHjaNjqQ==
+  dependencies:
+    "@remix-run/router" "1.16.1"
+
+react@*, "react@^0.14 || ^15.0.0 || ^16.0.0-alpha", "react@^0.14 || >=15", "react@^16.3.2 || ^17.0.0 || ^18.0.0", "react@^17.x || ^18.x", react@^18.0.0, react@^18.2.0, "react@>= 16.3.0", react@>=16.8:
   version "18.2.0"
   resolved "https://registry.npmjs.org/react/-/react-18.2.0.tgz"
   integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
@@ -1136,6 +1168,14 @@ typed-array-length@^1.0.4:
     call-bind "^1.0.2"
     for-each "^0.3.3"
     is-typed-array "^1.1.9"
+
+typewriter-effect@^2.21.0:
+  version "2.21.0"
+  resolved "https://registry.npmjs.org/typewriter-effect/-/typewriter-effect-2.21.0.tgz"
+  integrity sha512-Y3VL1fuJpUBj0gS4OTXBLzy1gnYTYaBuVuuO99tGNyTkkub5CXi+b/hsV7Og9fp6HlhogOwWJwgq7iXI5sQlEg==
+  dependencies:
+    prop-types "^15.8.1"
+    raf "^3.4.1"
 
 unbox-primitive@^1.0.2:
   version "1.0.2"
