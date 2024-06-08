@@ -1,4 +1,3 @@
-// src/components/LevelOneAssessment.js
 import React, { useState } from 'react';
 import './AssesHome.css';
 import { calculateBMI, healStories } from './helpers';

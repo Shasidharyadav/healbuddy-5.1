@@ -1,4 +1,3 @@
-// src/components/helpers.js
 export const calculateBMI = (height, weight) => {
     const heightInMeters = height * 0.3048; // Convert feet to meters
     return (weight / (heightInMeters ** 2)).toFixed(1);
