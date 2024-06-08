@@ -7,19 +7,19 @@ body {
   background-color: #f0f0f0;
 }
 
-h1{
-  text-align: center;
-  color: #399778; /* Prime Font Color */
-  margin: 10px;
-}
 /* Assessment Container */
 .assessment-container {
   max-width: 600px;
-  margin: 30px;
+  margin: 50px auto;
   padding: 20px;
   background-color: #9CFCCE; /* Sober Background Color */
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h1{
+  text-align: center;
+  
 }
 
 .assessment-header p {
@@ -30,8 +30,6 @@ h1{
 /* Question Styles */
 .question {
   margin-bottom: 20px;
-  font-weight: bold;
-  text-align: center;
 }
 
 .question p {
@@ -51,7 +49,7 @@ h1{
   background-color: #33D1AB; /* Second Font/Button Color */
   color: white;
   border: none;
-  padding: 10px;
+  padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
@@ -61,8 +59,13 @@ h1{
   background-color: #399778; /* Prime Font Color */
 }
 
+.options button.selected {
+  background-color: #399778; /* Prime Font Color */
+  color: white;
+}
+
 /* Previous Button Styles */
-.previous-button,.level2 {
+.previous-button {
   background-color: #33D1AB; /* Second Font/Button Color */
   color: white;
   border: none;
@@ -73,7 +76,7 @@ h1{
   margin-top: 10px;
 }
 
-.previous-button:hover,.level2:hover {
+.previous-button:hover {
   background-color: #399778; /* Prime Font Color */
 }
 

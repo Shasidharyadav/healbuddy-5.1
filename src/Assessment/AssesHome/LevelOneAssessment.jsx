@@ -8,14 +8,25 @@ const LevelOneAssessment = ({ onContinue }) => {
     const [height, setHeight] = useState(5.0);
     const [weight, setWeight] = useState(40);
     const [bmi, setBMI] = useState(null);
+    const [multiSelectAnswers, setMultiSelectAnswers] = useState([]);
 
     const handleNext = (nextStep, answer) => {
-        setAnswers(prev => ({ ...prev, [step]: answer }));
+        if (['L010500', 'L010900', 'L011000', 'L011100'].includes(step)) {
+            setAnswers(prev => ({ ...prev, [step]: multiSelectAnswers }));
+            if (step === 'L010500' && multiSelectAnswers.includes('No Pain')) {
+                setStep('END');
+                return;
+            }
+        } else {
+            setAnswers(prev => ({ ...prev, [step]: answer }));
+        }
         setStep(nextStep);
+        setMultiSelectAnswers([]);
     };
 
     const handlePrevious = (prevStep) => {
         setStep(prevStep);
+        setMultiSelectAnswers(answers[prevStep] || []);
     };
 
     const handleInputChange = (e) => {
@@ -33,6 +44,14 @@ const LevelOneAssessment = ({ onContinue }) => {
         const calculatedBMI = calculateBMI(height, weight);
         setBMI(calculatedBMI);
         handleNext('BMI_RESULT', `BMI: ${calculatedBMI}`);
+    };
+
+    const handleMultiSelectChange = (option) => {
+        setMultiSelectAnswers(prev =>
+            prev.includes(option)
+                ? prev.filter(item => item !== option)
+                : [...prev, option]
+        );
     };
 
     const renderQuestion = () => {
@@ -108,10 +127,17 @@ const LevelOneAssessment = ({ onContinue }) => {
                         <p>If you are undergoing pain in one or more areas, please select a location that pains or bothers you the most:</p>
                         <div className="options">
                             {['Lower Back', 'Upper Back', 'Neck', 'Hips', 'Knee', 'Ankle', 'Shoulder', 'Other Joints (Wrist/ finger/ toes/ nasal/ jaw)', 'Other Pain', 'No Pain'].map(option => (
-                                <button key={option} onClick={() => handleNext(option === 'No Pain' ? 'END' : 'L010600', option)}>{option}</button>
+                                <button
+                                    key={option}
+                                    onClick={() => handleMultiSelectChange(option)}
+                                    className={multiSelectAnswers.includes(option) ? 'selected' : ''}
+                                >
+                                    {option}
+                                </button>
                             ))}
                         </div>
                         <div className="options">
+                            <button onClick={() => handleNext('L010600', multiSelectAnswers)}>Next</button>
                             <button onClick={() => handlePrevious('BMI_RESULT')}>Previous</button>
                         </div>
                         <p>{healStories['L010500']}</p>
@@ -182,10 +208,17 @@ const LevelOneAssessment = ({ onContinue }) => {
                         <p>Alongside pain, have you encountered any of the following in recent times :</p>
                         <div className="options">
                             {['Dizzy', 'Tingling', 'Numbness', 'Weakness', 'Loss of Appetite', 'Severe Night Pain', 'Loss of Balance', 'High-grade fever', 'Shortness of Breath', 'None'].map(option => (
-                                <button key={option} onClick={() => handleNext('L011000', option)}>{option}</button>
+                                <button
+                                    key={option}
+                                    onClick={() => handleMultiSelectChange(option)}
+                                    className={multiSelectAnswers.includes(option) ? 'selected' : ''}
+                                >
+                                    {option}
+                                </button>
                             ))}
                         </div>
                         <div className="options">
+                            <button onClick={() => handleNext('L011000', multiSelectAnswers)}>Next</button>
                             <button onClick={() => handlePrevious('L010800')}>Previous</button>
                         </div>
                         <p>{healStories['L010900']}</p>
@@ -197,10 +230,17 @@ const LevelOneAssessment = ({ onContinue }) => {
                         <p>In certain rare conditions, the pain may also arise from previous medical histories. How is the current pain since it started?</p>
                         <div className="options">
                             {['Worsening', 'Much better than before', 'Same as before'].map(option => (
-                                <button key={option} onClick={() => handleNext('L011100', option)}>{option}</button>
+                                <button
+                                    key={option}
+                                    onClick={() => handleMultiSelectChange(option)}
+                                    className={multiSelectAnswers.includes(option) ? 'selected' : ''}
+                                >
+                                    {option}
+                                </button>
                             ))}
                         </div>
                         <div className="options">
+                            <button onClick={() => handleNext('L011100', multiSelectAnswers)}>Next</button>
                             <button onClick={() => handlePrevious('L010900')}>Previous</button>
                         </div>
                         <p>{healStories['L011000']}</p>
@@ -212,10 +252,17 @@ const LevelOneAssessment = ({ onContinue }) => {
                         <p>Please choose if you have been detected with any of the following medical conditions?</p>
                         <div className="options">
                             {['Pregnancy', 'Recent Surgery', 'Active Fractures', 'Cancer', 'Tuberculosis', 'None'].map(option => (
-                                <button key={option} onClick={() => handleNext('END', option)}>{option}</button>
+                                <button
+                                    key={option}
+                                    onClick={() => handleMultiSelectChange(option)}
+                                    className={multiSelectAnswers.includes(option) ? 'selected' : ''}
+                                >
+                                    {option}
+                                </button>
                             ))}
                         </div>
                         <div className="options">
+                            <button onClick={() => handleNext('END', multiSelectAnswers)}>Next</button>
                             <button onClick={() => handlePrevious('L011000')}>Previous</button>
                         </div>
                         <p>{healStories['L011100']}</p>
@@ -227,11 +274,11 @@ const LevelOneAssessment = ({ onContinue }) => {
                         <h3>Assessment Summary</h3>
                         <ul className="summary">
                             {Object.entries(answers).map(([question, answer]) => (
-                                <li key={question}>{question}: {answer}</li>
+                                <li key={question}>{question}: {Array.isArray(answer) ? answer.join(', ') : answer}</li>
                             ))}
                         </ul>
                         <p>Thank you for patiently responding to all the questions. We now have a provisional diagnosis for your condition.!</p>
-                        <button onClick={onContinue} className='level2'>Continue to Level 2</button>
+                        <button onClick={onContinue} className='continue-button'>Continue to Level 2</button>
                     </div>
                 );
             default:
