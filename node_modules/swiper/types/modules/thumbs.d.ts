@@ -1,4 +1,4 @@
-import Swiper from '../swiper-class';
+import type Swiper from '../swiper-class.d.ts';
 
 export interface ThumbsMethods {
   /**
@@ -25,7 +25,7 @@ export interface ThumbsOptions {
    *
    * @default null
    */
-  swiper?: Swiper | null;
+  swiper?: Swiper | string | null;
   /**
    * Additional class that will be added to activated thumbs swiper slide
    *

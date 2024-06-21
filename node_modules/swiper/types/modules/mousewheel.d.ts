@@ -1,5 +1,5 @@
-import Swiper from '../swiper-class';
-import { CSSSelector } from '../shared';
+import type Swiper from '../swiper-class.d.ts';
+import type { CSSSelector } from '../shared.d.ts';
 
 export interface MousewheelMethods {
   /**
@@ -27,15 +27,19 @@ export interface MousewheelEvents {
 
 export interface MousewheelOptions {
   /**
+   * Set to `true` to enable mousewheel control
+   *
+   * @default false
+   */
+  enabled?: boolean;
+  /**
    * Set to `true` to force mousewheel swipes to axis. So in horizontal mode mousewheel will work only with horizontal mousewheel scrolling, and only with vertical scrolling in vertical mode.
-
    *
    * @default false
    */
   forceToAxis?: boolean;
   /**
    * Set to `true` and swiper will release mousewheel event and allow page scrolling when swiper is on edge positions (in the beginning or in the end)
-
    *
    * @default false
    */
@@ -72,4 +76,11 @@ export interface MousewheelOptions {
    * @default null
    */
   thresholdTime?: number | null;
+
+  /**
+   * Scrolling on elements with this class will be ignored
+   *
+   * @default 'swiper-no-mousewheel'
+   */
+  noMousewheelClass?: string;
 }
