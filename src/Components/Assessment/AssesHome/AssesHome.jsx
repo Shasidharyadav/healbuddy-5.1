@@ -1,14 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import LevelOneAssessment from './LevelOneAssessment';
-import LevelTwoConfirmation from './LevelTwoConfirmation';
 import LevelTwoAssessment from './LevelTwoAssessment';
+import LevelTwoConfirmation from './LevelTwoConfirmation';
 import './style/AssesHome.css';
 
-const AssesHome = ({ profile, onCreateProfile }) => {
+const AssesHome = ({ profileId }) => {
     const [level, setLevel] = useState(1);
     const [levelOneAnswers, setLevelOneAnswers] = useState({});
     const [levelTwoAnswers, setLevelTwoAnswers] = useState({});
     const [confirmation, setConfirmation] = useState(false);
+    const [profile, setProfile] = useState(null);
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await axios.get(`/api/profiles/${profileId}`);
+                setProfile(response.data);
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+            }
+        };
+
+        fetchProfile();
+    }, [profileId]);
 
     const handleLevelOneContinue = (answers) => {
         setLevelOneAnswers(answers);
@@ -22,6 +37,8 @@ const AssesHome = ({ profile, onCreateProfile }) => {
 
     const handleLevelTwoComplete = (answers) => {
         setLevelTwoAnswers(answers);
+        // Submit final answers to backend or perform final actions
+        console.log('Final Assessment:', { levelOneAnswers, levelTwoAnswers });
     };
 
     const renderAssessment = () => {
@@ -31,7 +48,7 @@ const AssesHome = ({ profile, onCreateProfile }) => {
 
         switch (level) {
             case 1:
-                return <LevelOneAssessment onContinue={handleLevelOneContinue} profileName={profile.name} />;
+                return <LevelOneAssessment onContinue={handleLevelOneContinue} profileName={profile?.name} />;
             case 2:
                 return <LevelTwoAssessment onComplete={handleLevelTwoComplete} />;
             default:
@@ -40,7 +57,7 @@ const AssesHome = ({ profile, onCreateProfile }) => {
     };
 
     const renderSummary = () => {
-        if (levelTwoAnswers && Object.keys(levelTwoAnswers).length > 0) {
+        if (Object.keys(levelTwoAnswers).length > 0) {
             return (
                 <div className="summary-container">
                     <h3>Level 1 Assessment Summary</h3>
@@ -73,5 +90,3 @@ const AssesHome = ({ profile, onCreateProfile }) => {
 };
 
 export default AssesHome;
-
-

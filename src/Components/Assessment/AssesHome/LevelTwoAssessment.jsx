@@ -1,271 +1,299 @@
-import React, { useState } from 'react';
-import './style/AssesHome.css';
+import React, { useState, useEffect } from 'react';
+import './style/AssesHome.css'
+import { healStories } from './helper'; // Import healStories from helpers or relevant file
 
 const LevelTwoAssessment = ({ onComplete }) => {
     const [step, setStep] = useState('L020101');
     const [answers, setAnswers] = useState({});
-    const [completed, setCompleted] = useState(false);
+    const [multiSelectAnswers, setMultiSelectAnswers] = useState([]);
+    const [typingIndex, setTypingIndex] = useState(0);
 
-    const handleNext = (nextStep, question, answer) => {
-        setAnswers(prev => ({ ...prev, [question]: answer }));
+    useEffect(() => {
+        setTypingIndex(0); // Reset index when step changes
+        const timer = setInterval(() => {
+            setTypingIndex(prevIndex => {
+                if (prevIndex < healStories[step]?.length) {
+                    return prevIndex + 1;
+                } else {
+                    clearInterval(timer);
+                    return prevIndex;
+                }
+            });
+        }, 50);
+
+        return () => clearInterval(timer);
+    }, [step]);
+
+    const handleNext = (nextStep, questionCode, answer) => {
+        console.log(`${questionCode} ${answer}`);
+        setAnswers(prev => ({ ...prev, [questionCode]: answer }));
+        setMultiSelectAnswers([]); // Resetting multiSelectAnswers on every transition
         setStep(nextStep);
     };
 
-    const handlePrevious = () => {
-        switch (step) {
-            case 'L020102':
-                setStep('L020101');
-                break;
-            case 'L020201':
-                setStep(answers['L020101'] === 'Since the last 3 months' || answers['L020101'] === 'More than 3 months' ? 'L020102' : 'L020101');
-                break;
-            case 'L020301':
-                setStep('L020201');
-                break;
-            case 'L020401':
-                setStep('L020301');
-                break;
-            case 'L020402':
-                setStep('L020401');
-                break;
-            case 'L020501':
-                setStep(answers['L020401'] !== 'No surgeries reported' ? 'L020402' : 'L020401');
-                break;
-            case 'L020601':
-                setStep('L020501');
-                break;
-            case 'L020602':
-                setStep('L020601');
-                break;
-            case 'L020701':
-                setStep('L020602');
-                break;
-            case 'L020702':
-                setStep('L020701');
-                break;
-            case 'L020801':
-                setStep('L020702');
-                break;
-            case 'L020802':
-                setStep(answers['L020801'] !== 'Not undertaken any treatment/medication' ? 'L020801' : 'L020701');
-                break;
-            default:
-                setStep('L020101');
-                break;
-        }
+    const handlePrevious = (prevStep) => {
+        setStep(prevStep);
+        setMultiSelectAnswers(answers[prevStep] || []);
     };
 
-    const handleComplete = () => {
-        setCompleted(true);
-        onComplete(answers);
+    const handleMultiSelectChange = (option) => {
+        setMultiSelectAnswers(prev =>
+            prev.includes(option)
+                ? prev.filter(item => item !== option)
+                : [...prev, option]
+        );
     };
 
     const renderQuestion = () => {
-        if (completed) {
-            return (
-                <div className="question">
-                    <h3>Level 2 Assessment Summary</h3>
-                    <ul className="summary">
-                        {Object.entries(answers).map(([question, answer]) => (
-                            <li key={question}>{question}: {answer}</li>
-                        ))}
-                    </ul>
-                    <p>Thank you for responding to the questions. Your level 2 assessment is complete!</p>
-                </div>
-            );
-        }
-
         switch (step) {
             case 'L020101':
                 return (
                     <div className="question">
-                        <p>Duration of pain?</p>
+                        <p>We know how tough it is to be in the pain that you are in. We are here to help you get better and for that, we need some detailed information about your pain. Please help us with the duration since when have you been encountering the pain?</p>
                         <div className="options">
                             <button onClick={() => handleNext('L020201', 'L020101', 'Since the last 7 days')}>Since the last 7 days</button>
-                            <button onClick={() => handleNext('L020102', 'L020101', 'Since the last 3 months')}>Since the last 3 months</button>
-                            <button onClick={() => handleNext('L020102', 'L020101', 'More than 3 months')}>More than 3 months</button>
+                            <button onClick={() => handleNext('L020202', 'L020101', 'Since the last 3 months')}>Since the last 3 months</button>
+                            <button onClick={() => handleNext('L020202', 'L020101', 'More than 3 months')}>More than 3 months</button>
                         </div>
+                        <p>{healStories['L020101'].substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020102':
                 return (
                     <div className="question">
-                        <p>Did the pain suddenly relapse in the last 2 weeks?</p>
+                        <p>Since you mentioned that you have been having the pain for a while, did it suddenly relapse in the last 2 weeks?</p>
                         <div className="options">
                             <button onClick={() => handleNext('L020201', 'L020102', 'Yes')}>Yes</button>
                             <button onClick={() => handleNext('L020201', 'L020102', 'No')}>No</button>
                         </div>
+                        <p>{healStories['L020102'].substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020201':
                 return (
                     <div className="question">
-                        <p>Any diagnosed comorbidities?</p>
+                        <p>Sometimes there are multiple other chronic conditions that also lead to pain. In medical parlance, we refer to them as comorbidities or non-musculoskeletal conditions. Have you been diagnosed with/ undergone medical interventions/ feel any of the following conditions in last one year?</p>
                         <div className="options">
-                            <button onClick={() => handleNext('L020301', 'L020201', 'Diabetes')}>Diabetes</button>
-                            <button onClick={() => handleNext('L020301', 'L020201', 'Thyroid')}>Thyroid</button>
-                            <button onClick={() => handleNext('L020301', 'L020201', 'Hypertension/Blood pressure/stroke')}>Hypertension/Blood pressure/stroke</button>
-                            <button onClick={() => handleNext('L020301', 'L020201', 'Arthritis')}>Arthritis</button>
-                            <button onClick={() => handleNext('L020301', 'L020201', 'Osteopenia/Osteoporosis')}>Osteopenia/Osteoporosis</button>
-                            <button onClick={() => handleNext('L020301', 'L020201', 'Prostate Issues/Gynecological issues')}>Prostate Issues/Gynecological issues</button>
-                            <button onClick={() => handleNext('L020301', 'L020201', 'Cardiac/Heart conditions')}>Cardiac/Heart conditions</button>
-                            <button onClick={() => handleNext('L020301', 'L020201', 'Neurological conditions like Parkinson\'s/stroke')}>Neurological conditions like Parkinson\'s/stroke</button>
-                            <button onClick={() => handleNext('L020301', 'L020201', 'Severe Asthma')}>Severe Asthma</button>
-                            <button onClick={() => handleNext('L020301', 'L020201', 'Ankylosing Spondylolysis')}>Ankylosing Spondylolysis</button>
-                            <button onClick={() => handleNext('L020301', 'L020201', 'None of the Above')}>None of the Above</button>
+                            {['Diabetes', 'Thyroid', 'Hypertension/ Blood pressure/ stroke', 'Arthritis', 'Osteopenia/ Osteoporosis', 'Prostrate Issues/ gynecological issues', 'Cardiac/ Heart conditions', 'Neurological conditions like Parkinsons / stroke', 'Severe Asthma', 'Ankylosing Spondylolisis', 'None of the Above'].map(option => (
+                                <button
+                                    key={option}
+                                    onClick={() => handleMultiSelectChange(option)}
+                                    className={multiSelectAnswers.includes(option) ? 'selected' : ''}
+                                >
+                                    {option}
+                                </button>
+                            ))}
                         </div>
+                        <div className="options">
+                            <button onClick={() => handleNext('L020301', 'L020201', multiSelectAnswers)}>Next</button>
+                            <button onClick={() => handlePrevious('L020102')}>Previous</button>
+                        </div>
+                        <p>{healStories['L020201'].substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020301':
                 return (
                     <div className="question">
-                        <p>Any deficiencies?</p>
+                        <p>It is also important to ensure that your body doesn't have deficiencies of any of the critical components. Do you have deficiencies in any of the following?</p>
                         <div className="options">
-                            <button onClick={() => handleNext('L020401', 'L020301', 'Vitamin D3')}>Vitamin D3</button>
-                            <button onClick={() => handleNext('L020401', 'L020301', 'Vitamin B12')}>Vitamin B12</button>
-                            <button onClick={() => handleNext('L020401', 'L020301', 'Calcium')}>Calcium</button>
-                            <button onClick={() => handleNext('L020401', 'L020301', 'Haemoglobin/Iron')}>Haemoglobin/Iron</button>
-                            <button onClick={() => handleNext('L020401', 'L020301', 'Not yet tested/no deficiencies')}>Not yet tested/no deficiencies</button>
+                            {['Vitamin D3', 'Vitamin B12', 'Calcium', 'Haemoglobin/ iron', 'Not yet tested/ no deficiencies'].map(option => (
+                                <button
+                                    key={option}
+                                    onClick={() => handleMultiSelectChange(option)}
+                                    className={multiSelectAnswers.includes(option) ? 'selected' : ''}
+                                >
+                                    {option}
+                                </button>
+                            ))}
                         </div>
+                        <div className="options">
+                            <button onClick={() => handleNext('L020401', 'L020301', multiSelectAnswers)}>Next</button>
+                            <button onClick={() => handlePrevious('L020201')}>Previous</button>
+                        </div>
+                        <p>{healStories['L020301'].substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020401':
                 return (
                     <div className="question">
-                        <p>Any past surgeries?</p>
+                        <p>Musculoskeletal pain may arise from any injury to areas that have undergone surgical interventions in the past. Please select if you have undergone any of the following surgeries in the past:</p>
                         <div className="options">
-                            <button onClick={() => handleNext('L020402', 'L020401', 'Spine Surgery')}>Spine Surgery</button>
-                            <button onClick={() => handleNext('L020402', 'L020401', 'Cardiac Surgery')}>Cardiac Surgery</button>
-                            <button onClick={() => handleNext('L020402', 'L020401', 'Gynaec Surgery/Hernia')}>Gynaec Surgery/Hernia</button>
-                            <button onClick={() => handleNext('L020402', 'L020401', 'Joint Replacements')}>Joint Replacements</button>
-                            <button onClick={() => handleNext('L020402', 'L020401', 'Other Surgeries')}>Other Surgeries</button>
-                            <button onClick={() => handleNext('L020501', 'L020401', 'No surgeries reported')}>No surgeries reported</button>
+                            {['Spine Surgery', 'Cardiac Surgery', 'Gynaec Surgery/ Hernia', 'Joint Replacements', 'Other Surgeries', 'No surgeries reported'].map(option => (
+                                <button
+                                    key={option}
+                                    onClick={() => handleMultiSelectChange(option)}
+                                    className={multiSelectAnswers.includes(option) ? 'selected' : ''}
+                                >
+                                    {option}
+                                </button>
+                            ))}
                         </div>
+                        <div className="options">
+                            <button onClick={() => handleNext('L020402', 'L020401', multiSelectAnswers)}>Next</button>
+                            <button onClick={() => handlePrevious('L020301')}>Previous</button>
+                        </div>
+                        <p>{healStories['L020401'].substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020402':
                 return (
                     <div className="question">
-                        <p>Was the surgery done recently?</p>
+                        <p>Hope you're much better now. Was this surgery done recently?</p>
                         <div className="options">
                             <button onClick={() => handleNext('L020501', 'L020402', 'In the last 1 year')}>In the last 1 year</button>
                             <button onClick={() => handleNext('L020501', 'L020402', 'Done before the last year')}>Done before the last year</button>
                         </div>
+                        <div className="options">
+                            <button onClick={() => handlePrevious('L020401')}>Previous</button>
+                        </div>
+                        <p>{healStories['L020402'].substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020501':
                 return (
                     <div className="question">
-                        <p>First incidence of pain?</p>
+                        <p>Do you remember the first incidence of pain? If not, you may also share the incidences of pain during the early days.</p>
                         <div className="options">
-                            <button onClick={() => handleNext('L020601', 'L020501', 'With a fall/accident')}>With a fall/accident</button>
-                            <button onClick={() => handleNext('L020601', 'L020501', 'Normal bending')}>Normal bending</button>
-                            <button onClick={() => handleNext('L020601', 'L020501', 'Lifted heavy object')}>Lifted heavy object</button>
-                            <button onClick={() => handleNext('L020601', 'L020501', 'Traveling')}>Traveling</button>
-                            <button onClick={() => handleNext('L020601', 'L020501', 'Sudden jerk')}>Sudden jerk</button>
-                            <button onClick={() => handleNext('L020601', 'L020501', 'Working out')}>Working out</button>
-                            <button onClick={() => handleNext('L020601', 'L020501', 'Playing sports')}>Playing sports</button>
-                            <button onClick={() => handleNext('L020601', 'L020501', 'Nothing specific')}>Nothing specific</button>
+                            {['With a fall/accident', 'Normal bending', 'Lifted heavy object', 'Travelling', 'Sudden jerk', 'Working out', 'Playing sports', 'Nothing specific'].map(option => (
+                                <button
+                                    key={option}
+                                    onClick={() => handleNext('L020601', 'L020501', option)}
+                                >
+                                    {option}
+                                </button>
+                            ))}
                         </div>
+                        <div className="options">
+                            <button onClick={() => handlePrevious('L020402')}>Previous</button>
+                        </div>
+                        <p>{healStories['L020501'].substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020601':
                 return (
                     <div className="question">
-                        <p>Activities that lead to a rise in pain?</p>
+                        <p>Is there any activity/ multiple activities that lead to rise in pain when you do them?</p>
                         <div className="options">
-                            <button onClick={() => handleNext('L020602', 'L020601', "It's the first thing in the morning")}>It's the first thing in the morning</button>
-                            <button onClick={() => handleNext('L020602', 'L020601', 'While sitting on a chair/couch')}>While sitting on a chair/couch</button>
-                            <button onClick={() => handleNext('L020602', 'L020601', 'While sitting on the floor')}>While sitting on the floor</button>
-                            <button onClick={() => handleNext('L020602', 'L020601', 'While standing')}>While standing</button>
-                            <button onClick={() => handleNext('L020602', 'L020601', 'While walking')}>While walking</button>
-                            <button onClick={() => handleNext('L020602', 'L020601', 'While sleeping/resting')}>While sleeping/resting</button>
-                            <button onClick={() => handleNext('L020602', 'L020601', 'While bending/stooping')}>While bending/stooping</button>
-                            <button onClick={() => handleNext('L020602', 'L020601', 'While lifting weights')}>While lifting weights</button>
-                            <button onClick={() => handleNext('L020602', 'L020601', 'While doing exercises/working out')}>While doing exercises/working out</button>
-                            <button onClick={() => handleNext('L020602', 'L020601', "Pain doesn't aggravate")}>Pain doesn't aggravate</button>
+                            {['It\'s the first thing in the morning', 'While sitting on a chair/ couch', 'While sitting on the floor', 'While standing', 'While walking', 'While sleeping/ resting', 'While bending/ stooping', 'While lifting weights', 'While doing exercises/ working out', 'Pain doesn\'t aggravate'].map(option => (
+                                <button
+                                    key={option}
+                                    onClick={() => handleMultiSelectChange(option)}
+                                    className={multiSelectAnswers.includes(option) ? 'selected' : ''}
+                                >
+                                    {option}
+                                </button>
+                            ))}
                         </div>
+                        <div className="options">
+                            <button onClick={() => handleNext('L020602', 'L020601', multiSelectAnswers)}>Next</button>
+                            <button onClick={() => handlePrevious('L020501')}>Previous</button>
+                        </div>
+                        <p>{healStories['L020601'].substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020602':
                 return (
                     <div className="question">
-                        <p>Duration after which the pain increases when you perform the referred activity?</p>
+                        <p>Interesting! Can you also help us with the duration after which the pain increases when you perform the referred activity/activities?</p>
                         <div className="options">
                             <button onClick={() => handleNext('L020701', 'L020602', 'Immediately, i.e., within 10 mins')}>Immediately, i.e., within 10 mins</button>
                             <button onClick={() => handleNext('L020701', 'L020602', 'After a few minutes, i.e., 10-30 mins')}>After a few minutes, i.e., 10-30 mins</button>
                             <button onClick={() => handleNext('L020701', 'L020602', 'After a while, i.e., after 30 minutes')}>After a while, i.e., after 30 minutes</button>
                         </div>
+                        <div className="options">
+                            <button onClick={() => handlePrevious('L020601')}>Previous</button>
+                        </div>
+                        <p>{healStories['L020602'].substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020701':
                 return (
                     <div className="question">
-                        <p>Any activity that helps reduce your pain?</p>
+                        <p>And is there any activity/ activities that help you to reduce your pain?</p>
                         <div className="options">
-                            <button onClick={() => handleNext('L020702', 'L020701', 'External factors like balms/hot packs/ice packs')}>External factors like balms/hot packs/ice packs</button>
-                            <button onClick={() => handleNext('L020702', 'L020701', 'While sitting on a chair/couch')}>While sitting on a chair/couch</button>
-                            <button onClick={() => handleNext('L020702', 'L020701', 'While sitting on the floor')}>While sitting on the floor</button>
-                            <button onClick={() => handleNext('L020702', 'L020701', 'While standing')}>While standing</button>
-                            <button onClick={() => handleNext('L020702', 'L020701', 'While walking')}>While walking</button>
-                            <button onClick={() => handleNext('L020702', 'L020701', 'While sleeping/resting')}>While sleeping/resting</button>
-                            <button onClick={() => handleNext('L020702', 'L020701', 'While bending/stooping')}>While bending/stooping</button>
-                            <button onClick={() => handleNext('L020702', 'L020701', 'While lifting weights')}>While lifting weights</button>
-                            <button onClick={() => handleNext('L020702', 'L020701', 'While doing exercises/working out')}>While doing exercises/working out</button>
-                            <button onClick={() => handleNext('L020702', 'L020701', "Pain doesn't reduce")}>Pain doesn't reduce</button>
+                            {['External factors like balms/ hot packs/ ice packs', 'While sitting on a chair/ couch', 'While sitting on the floor', 'While standing', 'While walking', 'While sleeping/ resting', 'While bending/ stooping', 'While lifting weights', 'While doing exercises/ working out', 'Pain doesn\'t reduce', 'Correction of posture'].map(option => (
+                                <button
+                                    key={option}
+                                    onClick={() => handleMultiSelectChange(option)}
+                                    className={multiSelectAnswers.includes(option) ? 'selected' : ''}
+                                >
+                                    {option}
+                                </button>
+                            ))}
                         </div>
+                        <div className="options">
+                            <button onClick={() => handleNext('L020702', 'L020701', multiSelectAnswers)}>Next</button>
+                            <button onClick={() => handlePrevious('L020602')}>Previous</button>
+                        </div>
+                        <p>{healStories['L020701'].substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020702':
                 return (
                     <div className="question">
-                        <p>How long does it take for the pain to reduce?</p>
+                        <p>This is good to know! So how long does it take for the pain to reduce?</p>
                         <div className="options">
                             <button onClick={() => handleNext('L020801', 'L020702', 'Immediately, i.e., within 10 mins')}>Immediately, i.e., within 10 mins</button>
                             <button onClick={() => handleNext('L020801', 'L020702', 'After a few minutes, i.e., 10-30 mins')}>After a few minutes, i.e., 10-30 mins</button>
                             <button onClick={() => handleNext('L020801', 'L020702', 'After a while, i.e., after 30 minutes')}>After a while, i.e., after 30 minutes</button>
                         </div>
+                        <div className="options">
+                            <button onClick={() => handlePrevious('L020701')}>Previous</button>
+                        </div>
+                        <p>{healStories['L020702'].substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020801':
                 return (
                     <div className="question">
-                        <p>Any treatment undertaken in the past?</p>
+                        <p>Sincerely appreciate for taking time to answer all the questions. We have just one more question to go. Given that you have been impacted by the pain for some time, have you undertaken any kind of treatment in the past?</p>
                         <div className="options">
-                            <button onClick={() => handleNext('L020802', 'L020801', 'Applied pain relief gel/balm/spray')}>Applied pain relief gel/balm/spray</button>
-                            <button onClick={() => handleNext('L020802', 'L020801', 'Taken Medications under specialist supervision')}>Taken Medications under specialist supervision</button>
-                            <button onClick={() => handleNext('L020802', 'L020801', 'Taken Physiotherapy/TENS/IFT/TRACTION')}>Taken Physiotherapy/TENS/IFT/TRACTION</button>
-                            <button onClick={() => handleNext('L020802', 'L020801', 'Done home exercises by checking online videos')}>Done home exercises by checking online videos</button>
-                            <button onClick={() => handleNext('L020802', 'L020801', 'Simply took bed rest without taking any medicine or rehabilitation')}>Simply took bed rest without taking any medicine or rehabilitation</button>
-                            <button onClick={() => handleNext('L020802', 'L020801', 'Underwent ayurveda treatment')}>Underwent ayurveda treatment</button>
-                            <button onClick={() => handleNext('END', 'L020801', 'Not undertaken any treatment/medication')}>Not undertaken any treatment/medication</button>
+                            {['Applied pain relief gel/ balm / spray', 'Taken Medications under specialist supervision', 'Taken Physiotherapy/ TENS /IFT /TRACTION', 'Done home exercises by checking online videos', 'Simply took bed rest without taking any medicine or rehabilitation', 'Underwent ayurveda treatment', 'Not undertaken any treatment/ medication'].map(option => (
+                                <button
+                                    key={option}
+                                    onClick={() => handleMultiSelectChange(option)}
+                                    className={multiSelectAnswers.includes(option) ? 'selected' : ''}
+                                >
+                                    {option}
+                                </button>
+                            ))}
                         </div>
+                        <div className="options">
+                            <button onClick={() => handleNext('L020802', 'L020801', multiSelectAnswers)}>Next</button>
+                            <button onClick={() => handlePrevious('L020702')}>Previous</button>
+                        </div>
+                        <p>{healStories['L020801'].substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020802':
                 return (
                     <div className="question">
-                        <p>Did the previous treatment help?</p>
+                        <p>It is good that you considered to get treated. Did the previous treatment help you in any way?</p>
                         <div className="options">
-                            <button onClick={() => handleNext('END', 'L020802', 'The pain instead increased')}>The pain instead increased</button>
-                            <button onClick={() => handleNext('END', 'L020802', 'There was no change in pain')}>There was no change in pain</button>
-                            <button onClick={() => handleNext('END', 'L020802', 'It reduced my pain intensity but slight pain is still there')}>It reduced my pain intensity but slight pain is still there</button>
-                            <button onClick={() => handleNext('END', 'L020802', 'It gave me temporary relief at that time but the pain has relapsed')}>It gave me temporary relief at that time but the pain has relapsed</button>
-                            <button onClick={() => handleNext('END', 'L020802', 'I was well for a few months and the pain relapsed only recently again')}>I was well for a few months and the pain relapsed only recently again</button>
+                            <button onClick={() => handleNext('SUMMARY', 'L020802', 'The pain instead increased')}>The pain instead increased</button>
+                            <button onClick={() => handleNext('SUMMARY', 'L020802', 'There was no change in pain')}>There was no change in pain</button>
+                            <button onClick={() => handleNext('SUMMARY', 'L020802', 'It reduced my pain intensity, but slight pain is still there')}>It reduced my pain intensity, but slight pain is still there</button>
+                            <button onClick={() => handleNext('SUMMARY', 'L020802', 'It gave me temporary relief at that time, but the pain has relapsed')}>It gave me temporary relief at that time, but the pain has relapsed</button>
+                            <button onClick={() => handleNext('SUMMARY', 'L020802', 'I was well for a few months, and the pain relapsed only recently again')}>I was well for a few months, and the pain relapsed only recently again</button>
                         </div>
+                        <div className="options">
+                            <button onClick={() => handlePrevious('L020801')}>Previous</button>
+                        </div>
+                        <p>{healStories['L020802'].substring(0, typingIndex)}</p>
                     </div>
                 );
-            case 'END':
+            case 'SUMMARY':
                 return (
-                    <div className="question">
-                        <h3>Level 2 Assessment Summary</h3>
-                        <ul className="summary">
+                    <div className="summary">
+                        <h3>Assessment Summary</h3>
+                        <ul>
                             {Object.entries(answers).map(([question, answer]) => (
-                                <li key={question}>{question}: {answer}</li>
+                                <li key={question}>{question}: {Array.isArray(answer) ? answer.join(', ') : answer}</li>
                             ))}
                         </ul>
-                        <p>Thank you for responding to the questions. Your level 2 assessment is complete!</p>
-                        <button className="previous-button" onClick={handleComplete}>Complete Assessment</button>
+                        <div className="options">
+                            <button onClick={() => onComplete(answers)}>Complete Assessment</button>
+                        </div>
                     </div>
                 );
             default:
@@ -276,7 +304,6 @@ const LevelTwoAssessment = ({ onComplete }) => {
     return (
         <div className="assessment-container">
             {renderQuestion()}
-            {step !== 'END' && step !== 'L020101' && <button className="previous-button" onClick={handlePrevious}>Previous</button>}
         </div>
     );
 };
