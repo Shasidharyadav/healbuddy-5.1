@@ -14,8 +14,21 @@ const AssesHome = ({ profileId }) => {
 
     useEffect(() => {
         const fetchProfile = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('Token is not available');
+                return;
+            }
+
+            if (!profileId) {
+                console.error('Profile ID is not defined');
+                return;
+            }
+
             try {
-                const response = await axios.get(`/api/profiles/${profileId}`);
+                const response = await axios.get(`/api/profiles/${profileId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 setProfile(response.data);
             } catch (error) {
                 console.error('Error fetching profile:', error);
@@ -35,10 +48,25 @@ const AssesHome = ({ profileId }) => {
         setLevel(2);
     };
 
-    const handleLevelTwoComplete = (answers) => {
+    const handleLevelTwoComplete = async (answers) => {
         setLevelTwoAnswers(answers);
-        // Submit final answers to backend or perform final actions
-        console.log('Final Assessment:', { levelOneAnswers, levelTwoAnswers });
+        const assessmentSummary = {
+            profileId,
+            levelOneAnswers,
+            levelTwoAnswers
+        };
+
+        console.log('Submitting assessment summary:', assessmentSummary); // Log the payload
+
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.post('/api/assessment-summary', assessmentSummary, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            console.log('Assessment summary saved:', response.data);
+        } catch (error) {
+            console.error('Error saving assessment summary:', error.response ? error.response.data : error.message);
+        }
     };
 
     const renderAssessment = () => {
@@ -63,13 +91,13 @@ const AssesHome = ({ profileId }) => {
                     <h3>Level 1 Assessment Summary</h3>
                     <ul className="summary">
                         {Object.entries(levelOneAnswers).map(([question, answer]) => (
-                            <li key={question}>{question}: {answer}</li>
+                            <li key={question}>{question}: {Array.isArray(answer) ? answer.join(', ') : answer}</li>
                         ))}
                     </ul>
                     <h3>Level 2 Assessment Summary</h3>
                     <ul className="summary">
                         {Object.entries(levelTwoAnswers).map(([question, answer]) => (
-                            <li key={question}>{question}: {answer}</li>
+                            <li key={question}>{question}: {Array.isArray(answer) ? answer.join(', ') : answer}</li>
                         ))}
                     </ul>
                 </div>

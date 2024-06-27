@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import profileRoutes from './routes/profile.js';
 import authRoutes from './routes/auth.js';
+import assessmentSummaryRoutes from './routes/assessmentsSummary.js'; // Import the new route correctly
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ mongoose.connect(process.env.MONGO_URI, {
 
 app.use('/api/profiles', profileRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/assessment-summary', assessmentSummaryRoutes); // Add the new route
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -14,9 +14,15 @@ const Dashboard = () => {
 
     useEffect(() => {
         const fetchProfiles = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/login'); // Redirect to login if token is missing
+                return;
+            }
+
             try {
                 const response = await axios.get('/api/profiles/check-profiles', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
                 setProfiles(response.data);
 
@@ -49,6 +55,12 @@ const Dashboard = () => {
 
     const handleProfileSubmit = async (e) => {
         e.preventDefault();
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/login'); // Redirect to login if token is missing
+            return;
+        }
+
         const profileDetails = {
             profileName: e.target.profileName.value,
             name: e.target.name.value,
@@ -62,7 +74,7 @@ const Dashboard = () => {
 
         try {
             const response = await axios.post('/api/profiles/create-profile', profileDetails, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             setProfiles([...profiles, response.data]);
             setSelectedProfile(response.data);
@@ -200,7 +212,7 @@ const Dashboard = () => {
                         </div>
                     )}
                     {showAssessment && selectedProfile && (
-                        <AssesHome profile={selectedProfile} />
+                        <AssesHome profileId={selectedProfile._id} />
                     )}
                 </div>
             </div>
