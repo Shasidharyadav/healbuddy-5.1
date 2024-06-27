@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import './style/AssesHome.css'
-import { healStories } from './helper'; // Import healStories from helpers or relevant file
+import './style/AssesHome.css';
+import { healStories } from './helpers';
 
 const LevelTwoAssessment = ({ onComplete }) => {
     const [step, setStep] = useState('L020101');
@@ -12,7 +12,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
         setTypingIndex(0); // Reset index when step changes
         const timer = setInterval(() => {
             setTypingIndex(prevIndex => {
-                if (prevIndex < healStories[step]?.length) {
+                if (healStories[step] && prevIndex < healStories[step].length) {
                     return prevIndex + 1;
                 } else {
                     clearInterval(timer);
@@ -55,7 +55,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                             <button onClick={() => handleNext('L020202', 'L020101', 'Since the last 3 months')}>Since the last 3 months</button>
                             <button onClick={() => handleNext('L020202', 'L020101', 'More than 3 months')}>More than 3 months</button>
                         </div>
-                        <p>{healStories['L020101'].substring(0, typingIndex)}</p>
+                        <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020102':
@@ -66,7 +66,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                             <button onClick={() => handleNext('L020201', 'L020102', 'Yes')}>Yes</button>
                             <button onClick={() => handleNext('L020201', 'L020102', 'No')}>No</button>
                         </div>
-                        <p>{healStories['L020102'].substring(0, typingIndex)}</p>
+                        <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020201':
@@ -88,7 +88,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                             <button onClick={() => handleNext('L020301', 'L020201', multiSelectAnswers)}>Next</button>
                             <button onClick={() => handlePrevious('L020102')}>Previous</button>
                         </div>
-                        <p>{healStories['L020201'].substring(0, typingIndex)}</p>
+                        <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020301':
@@ -110,7 +110,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                             <button onClick={() => handleNext('L020401', 'L020301', multiSelectAnswers)}>Next</button>
                             <button onClick={() => handlePrevious('L020201')}>Previous</button>
                         </div>
-                        <p>{healStories['L020301'].substring(0, typingIndex)}</p>
+                        <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020401':
@@ -132,7 +132,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                             <button onClick={() => handleNext('L020402', 'L020401', multiSelectAnswers)}>Next</button>
                             <button onClick={() => handlePrevious('L020301')}>Previous</button>
                         </div>
-                        <p>{healStories['L020401'].substring(0, typingIndex)}</p>
+                        <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020402':
@@ -146,7 +146,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                         <div className="options">
                             <button onClick={() => handlePrevious('L020401')}>Previous</button>
                         </div>
-                        <p>{healStories['L020402'].substring(0, typingIndex)}</p>
+                        <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020501':
@@ -166,7 +166,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                         <div className="options">
                             <button onClick={() => handlePrevious('L020402')}>Previous</button>
                         </div>
-                        <p>{healStories['L020501'].substring(0, typingIndex)}</p>
+                        <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020601':
@@ -188,7 +188,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                             <button onClick={() => handleNext('L020602', 'L020601', multiSelectAnswers)}>Next</button>
                             <button onClick={() => handlePrevious('L020501')}>Previous</button>
                         </div>
-                        <p>{healStories['L020601'].substring(0, typingIndex)}</p>
+                        <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020602':
@@ -203,7 +203,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                         <div className="options">
                             <button onClick={() => handlePrevious('L020601')}>Previous</button>
                         </div>
-                        <p>{healStories['L020602'].substring(0, typingIndex)}</p>
+                        <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020701':
@@ -225,7 +225,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                             <button onClick={() => handleNext('L020702', 'L020701', multiSelectAnswers)}>Next</button>
                             <button onClick={() => handlePrevious('L020602')}>Previous</button>
                         </div>
-                        <p>{healStories['L020701'].substring(0, typingIndex)}</p>
+                        <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020702':
@@ -240,7 +240,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                         <div className="options">
                             <button onClick={() => handlePrevious('L020701')}>Previous</button>
                         </div>
-                        <p>{healStories['L020702'].substring(0, typingIndex)}</p>
+                        <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020801':
@@ -262,7 +262,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                             <button onClick={() => handleNext('L020802', 'L020801', multiSelectAnswers)}>Next</button>
                             <button onClick={() => handlePrevious('L020702')}>Previous</button>
                         </div>
-                        <p>{healStories['L020801'].substring(0, typingIndex)}</p>
+                        <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'L020802':
@@ -279,7 +279,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                         <div className="options">
                             <button onClick={() => handlePrevious('L020801')}>Previous</button>
                         </div>
-                        <p>{healStories['L020802'].substring(0, typingIndex)}</p>
+                        <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
                 );
             case 'SUMMARY':

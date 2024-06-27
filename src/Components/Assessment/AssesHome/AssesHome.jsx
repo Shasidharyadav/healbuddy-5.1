@@ -53,7 +53,7 @@ const AssesHome = ({ profileId }) => {
         const assessmentSummary = {
             profileId,
             levelOneAnswers,
-            levelTwoAnswers
+            levelTwoAnswers: answers // Ensuring levelTwoAnswers are included
         };
 
         console.log('Submitting assessment summary:', assessmentSummary); // Log the payload
