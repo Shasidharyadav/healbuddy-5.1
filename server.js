@@ -1,11 +1,17 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import profileRoutes from './routes/profile.js';
 import authRoutes from './routes/auth.js';
-import assessmentSummaryRoutes from './routes/assessmentsSummary.js'; // Import the new route correctly
+import assessmentSummaryRoutes from './routes/assessmentsSummary.js';
 
 dotenv.config();
+
+// Fix __dirname issue
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json());
@@ -17,9 +23,12 @@ mongoose.connect(process.env.MONGO_URI, {
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.error('MongoDB connection error:', err));
 
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use('/api/profiles', profileRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/assessment-summary', assessmentSummaryRoutes); // Add the new route
+app.use('/api/assessment-summary', assessmentSummaryRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
