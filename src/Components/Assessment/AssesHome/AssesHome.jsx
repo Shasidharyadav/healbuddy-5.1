@@ -109,7 +109,7 @@ const AssesHome = ({ profileId }) => {
 
     return (
         <div className="asses-home">
-            <h1>Assessment Home</h1>
+            <h1></h1>
             <div className="assessment-frame">
                 {renderAssessment()}
                 {renderSummary()}

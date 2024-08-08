@@ -34,7 +34,8 @@ function App() {
             </>
           } />
           <Route path="/assessment-home" element={<AssesHome />} />
-          <Route path="/auth" element={<Auth />} />
+          <Route path="/auth" element={<div className="auth-body">
+            <Auth /> </div>} />
           <Route path="/dashboard" element={
             <PrivateRoute>
               <Dashboard />

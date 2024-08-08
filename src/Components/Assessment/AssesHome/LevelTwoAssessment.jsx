@@ -7,6 +7,8 @@ const LevelTwoAssessment = ({ onComplete }) => {
     const [answers, setAnswers] = useState({});
     const [multiSelectAnswers, setMultiSelectAnswers] = useState([]);
     const [typingIndex, setTypingIndex] = useState(0);
+    const [isEditing, setIsEditing] = useState(false);
+    const [history, setHistory] = useState([]); // to keep track of question flow
 
     useEffect(() => {
         setTypingIndex(0); // Reset index when step changes
@@ -24,16 +26,36 @@ const LevelTwoAssessment = ({ onComplete }) => {
         return () => clearInterval(timer);
     }, [step]);
 
-    const handleNext = (nextStep, questionCode, answer) => {
-        console.log(`${questionCode} ${answer}`);
-        setAnswers(prev => ({ ...prev, [questionCode]: answer }));
-        setMultiSelectAnswers([]); // Resetting multiSelectAnswers on every transition
-        setStep(nextStep);
+    const saveStateToLocalStorage = () => {
+        const state = {
+            step,
+            answers,
+            history,
+        };
+        localStorage.setItem('assessmentState', JSON.stringify(state));
     };
 
-    const handlePrevious = (prevStep) => {
-        setStep(prevStep);
-        setMultiSelectAnswers(answers[prevStep] || []);
+    const handleNext = (nextStep, questionCode, answer) => {
+        if (isMandatoryQuestion(step) && !isAnswerProvided(step, answer)) {
+            window.alert('This question is mandatory. Please provide an answer to proceed.');
+            return;
+        }
+        console.log(`${questionCode} ${answer}`);
+        setAnswers(prev => ({ ...prev, [questionCode]: answer }));
+        setHistory(prev => [...prev, step]); // add current step to history
+        setMultiSelectAnswers([]); // Resetting multiSelectAnswers on every transition
+        setStep(nextStep);
+        saveStateToLocalStorage();
+    };
+
+    const handlePrevious = () => {
+        if (history.length > 0) {
+            const prevStep = history[history.length - 1];
+            setHistory(history.slice(0, -1));
+            setStep(prevStep);
+            setMultiSelectAnswers(answers[prevStep] || []);
+            saveStateToLocalStorage();
+        }
     };
 
     const handleMultiSelectChange = (option) => {
@@ -42,6 +64,28 @@ const LevelTwoAssessment = ({ onComplete }) => {
                 ? prev.filter(item => item !== option)
                 : [...prev, option]
         );
+    };
+
+    const handleEditQuestion = (questionCode) => {
+        setStep(questionCode);
+        setMultiSelectAnswers(answers[questionCode] || []);
+        setIsEditing(true);
+    };
+
+    const handleSave = (questionCode, answer) => {
+        setAnswers(prev => ({ ...prev, [questionCode]: answer }));
+        setStep('SUMMARY');
+        setIsEditing(false);
+        saveStateToLocalStorage();
+    };
+
+    const isMandatoryQuestion = (questionCode) => {
+        const mandatoryQuestions = ['L020601', 'L020701'];
+        return mandatoryQuestions.includes(questionCode);
+    };
+
+    const isAnswerProvided = (questionCode, answer) => {
+        return answer !== null && answer !== undefined && answer !== '';
     };
 
     const renderQuestion = () => {
@@ -86,7 +130,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                         </div>
                         <div className="options">
                             <button onClick={() => handleNext('L020301', 'L020201', multiSelectAnswers)}>Next</button>
-                            <button onClick={() => handlePrevious('L020102')}>Previous</button>
+                            <button onClick={() => handlePrevious()}>Previous</button>
                         </div>
                         <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
@@ -108,7 +152,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                         </div>
                         <div className="options">
                             <button onClick={() => handleNext('L020401', 'L020301', multiSelectAnswers)}>Next</button>
-                            <button onClick={() => handlePrevious('L020201')}>Previous</button>
+                            <button onClick={() => handlePrevious()}>Previous</button>
                         </div>
                         <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
@@ -130,7 +174,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                         </div>
                         <div className="options">
                             <button onClick={() => handleNext('L020402', 'L020401', multiSelectAnswers)}>Next</button>
-                            <button onClick={() => handlePrevious('L020301')}>Previous</button>
+                            <button onClick={() => handlePrevious()}>Previous</button>
                         </div>
                         <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
@@ -144,7 +188,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                             <button onClick={() => handleNext('L020501', 'L020402', 'Done before the last year')}>Done before the last year</button>
                         </div>
                         <div className="options">
-                            <button onClick={() => handlePrevious('L020401')}>Previous</button>
+                            <button onClick={() => handlePrevious()}>Previous</button>
                         </div>
                         <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
@@ -164,7 +208,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                             ))}
                         </div>
                         <div className="options">
-                            <button onClick={() => handlePrevious('L020402')}>Previous</button>
+                            <button onClick={() => handlePrevious()}>Previous</button>
                         </div>
                         <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
@@ -185,8 +229,14 @@ const LevelTwoAssessment = ({ onComplete }) => {
                             ))}
                         </div>
                         <div className="options">
-                            <button onClick={() => handleNext('L020602', 'L020601', multiSelectAnswers)}>Next</button>
-                            <button onClick={() => handlePrevious('L020501')}>Previous</button>
+                            {isEditing ? (
+                                <button onClick={() => handleSave('L020601', multiSelectAnswers)}>Save</button>
+                            ) : (
+                                <>
+                                    <button onClick={() => handleNext('L020602', 'L020601', multiSelectAnswers)}>Next</button>
+                                    <button onClick={() => handlePrevious()}>Previous</button>
+                                </>
+                            )}
                         </div>
                         <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
@@ -201,7 +251,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                             <button onClick={() => handleNext('L020701', 'L020602', 'After a while, i.e., after 30 minutes')}>After a while, i.e., after 30 minutes</button>
                         </div>
                         <div className="options">
-                            <button onClick={() => handlePrevious('L020601')}>Previous</button>
+                            <button onClick={() => handlePrevious()}>Previous</button>
                         </div>
                         <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
@@ -222,8 +272,14 @@ const LevelTwoAssessment = ({ onComplete }) => {
                             ))}
                         </div>
                         <div className="options">
-                            <button onClick={() => handleNext('L020702', 'L020701', multiSelectAnswers)}>Next</button>
-                            <button onClick={() => handlePrevious('L020602')}>Previous</button>
+                            {isEditing ? (
+                                <button onClick={() => handleSave('L020701', multiSelectAnswers)}>Save</button>
+                            ) : (
+                                <>
+                                    <button onClick={() => handleNext('L020702', 'L020701', multiSelectAnswers)}>Next</button>
+                                    <button onClick={() => handlePrevious()}>Previous</button>
+                                </>
+                            )}
                         </div>
                         <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
@@ -238,7 +294,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                             <button onClick={() => handleNext('L020801', 'L020702', 'After a while, i.e., after 30 minutes')}>After a while, i.e., after 30 minutes</button>
                         </div>
                         <div className="options">
-                            <button onClick={() => handlePrevious('L020701')}>Previous</button>
+                            <button onClick={() => handlePrevious()}>Previous</button>
                         </div>
                         <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
@@ -260,7 +316,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                         </div>
                         <div className="options">
                             <button onClick={() => handleNext('L020802', 'L020801', multiSelectAnswers)}>Next</button>
-                            <button onClick={() => handlePrevious('L020702')}>Previous</button>
+                            <button onClick={() => handlePrevious()}>Previous</button>
                         </div>
                         <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
@@ -277,7 +333,7 @@ const LevelTwoAssessment = ({ onComplete }) => {
                             <button onClick={() => handleNext('SUMMARY', 'L020802', 'I was well for a few months, and the pain relapsed only recently again')}>I was well for a few months, and the pain relapsed only recently again</button>
                         </div>
                         <div className="options">
-                            <button onClick={() => handlePrevious('L020801')}>Previous</button>
+                            <button onClick={() => handlePrevious()}>Previous</button>
                         </div>
                         <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
@@ -288,7 +344,10 @@ const LevelTwoAssessment = ({ onComplete }) => {
                         <h3>Assessment Summary</h3>
                         <ul>
                             {Object.entries(answers).map(([question, answer]) => (
-                                <li key={question}>{question}: {Array.isArray(answer) ? answer.join(', ') : answer}</li>
+                                <li key={question}>
+                                    {question}: {Array.isArray(answer) ? answer.join(', ') : answer}
+                                    <button onClick={() => handleEditQuestion(question)}>Edit</button>
+                                </li>
                             ))}
                         </ul>
                         <div className="options">

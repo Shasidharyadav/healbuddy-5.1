@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import './Auth.css';
 
 const Auth = () => {
     const [isSignup, setIsSignup] = useState(true);
@@ -27,26 +28,27 @@ const Auth = () => {
     };
 
     return (
-        <div>
-            <h1>{isSignup ? 'Signup' : 'Login'}</h1>
-            <form onSubmit={handleSubmit}>
-                {isSignup && <div>
-                    <label>Name</label>
-                    <input type="text" name="name" required />
-                </div>}
-                <div>
-                    <label>Email</label>
-                    <input type="email" name="email" required />
-                </div>
-                <div>
-                    <label>Password</label>
-                    <input type="password" name="password" required />
-                </div>
-                <button type="submit">{isSignup ? 'Signup' : 'Login'}</button>
-            </form>
-            <button onClick={() => setIsSignup(!isSignup)}>
-                Switch to {isSignup ? 'Login' : 'Signup'}
-            </button>
+        <div className="auth-main">
+            <input type="checkbox" id="auth-chk" aria-hidden="true" checked={!isSignup} onChange={() => setIsSignup(!isSignup)} />
+
+            <div className="auth-signup">
+                <form className="auth-form" onSubmit={handleSubmit}>
+                    <label className="auth-label" htmlFor="auth-chk" aria-hidden="true">Sign Up</label>
+                    <input className="auth-input" type="text" name="name" placeholder="User name" required={isSignup} />
+                    <input className="auth-input" type="email" name="email" placeholder="Email" required />
+                    <input className="auth-input" type="password" name="password" placeholder="Password" required />
+                    <button className="auth-button" type="submit">Sign up</button>
+                </form>
+            </div>
+
+            <div className="auth-login">
+                <form className="auth-form" onSubmit={handleSubmit}>
+                    <label className="auth-label" htmlFor="auth-chk" aria-hidden="true">Login</label>
+                    <input className="auth-input" type="email" name="email" placeholder="Email" required />
+                    <input className="auth-input" type="password" name="password" placeholder="Password" required />
+                    <button className="auth-button" type="submit">Login</button>
+                </form>
+            </div>
         </div>
     );
 };

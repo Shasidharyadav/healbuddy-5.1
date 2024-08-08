@@ -35,13 +35,14 @@ const CalculateScoreButton = ({ profileId }) => {
                 if (sheet) {
                     clearColumn(sheet, 'C');
                     clearColumn(sheet, 'D'); // Assuming 'D' is the next column for multiple choices
+                    clearColumn(sheet, 'E'); // Clear 'E' column for multiple choices
                 }
             });
 
             // Map answers to the Response sheet
             const responseSheet = workbook.Sheets['Response'];
-            mapAnswersToSheet(responseSheet, data.levelOneAnswers, 'C', 'D');
-            mapAnswersToSheet(responseSheet, data.levelTwoAnswers, 'C', 'D');
+            mapAnswersToSheet(responseSheet, data.levelOneAnswers, 'C');
+            mapAnswersToSheet(responseSheet, data.levelTwoAnswers, 'C');
 
             // Calculate scores from all scoring sheets
             let total = 0;
@@ -84,16 +85,18 @@ const CalculateScoreButton = ({ profileId }) => {
         }
     };
 
-    const mapAnswersToSheet = (sheet, answers, primaryColumn, secondaryColumn) => {
+    const mapAnswersToSheet = (sheet, answers, startColumn) => {
         Object.keys(answers).forEach(key => {
             const row = findRowByQuestionCode(sheet, key);
             if (row !== null) {
                 const answer = answers[key];
-                const cellValue = Array.isArray(answer) ? answer.join(', ') : answer;
-                sheet[`${primaryColumn}${row}`] = { v: cellValue };
-
-                if (Array.isArray(answer) && answer.length > 1) {
-                    sheet[`${secondaryColumn}${row}`] = { v: cellValue };
+                if (Array.isArray(answer)) {
+                    answer.forEach((value, index) => {
+                        const column = XLSX.utils.encode_col(XLSX.utils.decode_col(startColumn) + index);
+                        sheet[`${column}${row}`] = { v: value };
+                    });
+                } else {
+                    sheet[`${startColumn}${row}`] = { v: answer };
                 }
             }
         });

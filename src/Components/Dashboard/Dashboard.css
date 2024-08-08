@@ -9,42 +9,45 @@
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 20px;
-}
-
-.navbar .button {
-  padding: 10px 20px;
-  font-size: 16px;
+  background-color: #33333300;
+  padding: 10px;
 }
 
 .dashboard-content {
-  display: flex;
-  justify-content: space-between;
   width: 100%;
-  max-width: 1200px;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border-radius: 8px;
 }
-
-.left-side {
-  flex: 1;
-  padding-right: 20px;
+.dashboard-button{
+  background-color: #1ba186;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+  
+}
+button{
+  
+}
+.dashboard-button:hover{
+  background-color: #12705d;
 }
 
 .right-side {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.right-side .button {
-  margin-bottom: 20px;
+  width: 100%;
 }
 
 form {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 100%;
 }
 
 form div {
@@ -53,15 +56,65 @@ form div {
 }
 
 form label {
+  margin-bottom: 5px;
   font-weight: bold;
+  color: #47ae4b;
 }
 
-form input,
+form input[type="text"],
 form select,
-form button {
+.react-select-container {
   padding: 10px;
+  border: 1px solid #4CAF50;
+  border-radius: 5px;
   font-size: 16px;
-  margin-top: 5px;
+}
+
+.react-select-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #4CAF50;
+  border-radius: 5px;
+}
+
+.react-select__control {
+  border: none;
+  box-shadow: none;
+}
+
+.react-select__control--is-focused {
+  border: 1px solid #4CAF50;
+  box-shadow: 0 0 0 1px #4CAF50;
+}
+
+.react-select__menu {
+  border-radius: 0 0 5px 5px;
+  border: 1px solid #4CAF50;
+}
+
+.react-select__option--is-focused {
+  background-color: #e0f2e9;
+}
+
+.react-select__option--is-selected {
+  background-color: #4CAF50;
+  color: white;
+}
+
+button[type="submit"] {
+  background-color: #ffffff;
+  color: #1ba186;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+  align-self: flex-end;
+}
+
+button[type="submit"]:hover {
+  background-color: #a3caa5;
+  color: #333;
 }
 
 ul {
@@ -74,6 +127,30 @@ ul li {
 }
 
 ul li button {
-  padding: 10px;
+  background-color: #1ba186;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
   font-size: 16px;
+  border-radius: 5px;
+  width: 50%;
+}
+
+ul li button:hover {
+  background-color: #12705d;
+}
+
+h3 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+p {
+  margin: 10px 0;
+  color: #333;
+}
+
+p b {
+  font-weight: bold;
 }
