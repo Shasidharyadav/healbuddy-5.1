@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './style/AssesHome.css';
-import { healStories } from './helpers';
+import { healStories } from './helper';
 
 const LevelTwoAssessment = ({ onComplete }) => {
     const [step, setStep] = useState('L020101');
@@ -96,8 +96,8 @@ const LevelTwoAssessment = ({ onComplete }) => {
                         <p>We know how tough it is to be in the pain that you are in. We are here to help you get better and for that, we need some detailed information about your pain. Please help us with the duration since when have you been encountering the pain?</p>
                         <div className="options">
                             <button onClick={() => handleNext('L020201', 'L020101', 'Since the last 7 days')}>Since the last 7 days</button>
-                            <button onClick={() => handleNext('L020202', 'L020101', 'Since the last 3 months')}>Since the last 3 months</button>
-                            <button onClick={() => handleNext('L020202', 'L020101', 'More than 3 months')}>More than 3 months</button>
+                            <button onClick={() => handleNext('L020201', 'L020101', 'Since the last 3 months')}>Since the last 3 months</button>
+                            <button onClick={() => handleNext('L020201', 'L020101', 'More than 3 months')}>More than 3 months</button>
                         </div>
                         <p>{healStories[step]?.substring(0, typingIndex)}</p>
                     </div>
