@@ -7,7 +7,7 @@ export default defineConfig({
     rollupOptions: {
       external: ['xlsx'], // Mark 'xlsx' as external
     },
-    outDir: 'dist',
+    outDir: 'frontend',
   },
   server: {
     proxy: {
