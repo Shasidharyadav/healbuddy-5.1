@@ -11,13 +11,13 @@
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/backend/server.js" },
-    { "src": "/(.*)", "dest": "/frontend/" }
-  ],
-  "build": {
-    "env": {
-      "NODE_ENV": "production"
+    {
+      "src": "/api/(.*)",
+      "dest": "/backend/server.js"
     },
-    "installCommand": "npm install --legacy-peer-deps"
-  }
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/dist/$1"
+    }
+  ]
 }
