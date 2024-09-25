@@ -4,82 +4,33 @@ import * as XLSX from 'xlsx';
 
 const CalculateScoreButton = ({ profileId }) => {
     const [diagnosisData, setDiagnosisData] = useState(null);  // Store the Provisional Diagnosis data
+    const [submissionSuccess, setSubmissionSuccess] = useState(false);  // Track submission status
+    const [error, setError] = useState(null);  // Track errors
 
-    const calculateScore = async () => {
+    // Function to fetch profile data (name, age, gender) by profileId
+    const fetchProfileData = async (profileId, token) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`/api/assessment-summary/${profileId}/answers`, {
+            const response = await axios.get(`/api/profiles/${profileId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-
-            if (response.status === 404) {
-                console.error('Answers not found for the given profile ID.');
-                return;
-            }
-
-            const data = response.data;
-
-            // 1. Fetch the Excel file from the server
-            const fileResponse = await fetch('/Excel/Lotus Algorithm Simulator_18092024.xlsx');
-            
-            // Check if the file is successfully fetched
-            if (!fileResponse.ok) {
-                throw new Error('Failed to fetch Excel file. Please check the file path.');
-            }
-
-            const arrayBuffer = await fileResponse.arrayBuffer();
-
-            // Attempt to parse the file as a workbook
-            let workbook;
-            try {
-                workbook = XLSX.read(arrayBuffer, { type: 'array' });
-            } catch (error) {
-                throw new Error('Failed to parse Excel file. Ensure the file is a valid Excel document.');
-            }
-
-            // 2. Access the "Provisional Diagnosis" sheet
-            const diagnosisSheet = workbook.Sheets['Provisional Diagnosis'];
-            if (!diagnosisSheet) {
-                throw new Error('Provisional Diagnosis sheet not found.');
-            }
-
-            // 3. Clear all values in the Provisional Diagnosis sheet except column A
-
-            // 4. Map answers to the "Response" sheet and update the workbook
-            const responseSheet = workbook.Sheets['Response'];
-            clearColumn(responseSheet, 'D');
-            clearColumn(responseSheet, 'E');
-            clearColumn(responseSheet, 'F');
-
-            mapAnswersToSheet(responseSheet, data.levelOneAnswers, 'D');  // Map Level 1 answers
-            mapAnswersToSheet(responseSheet, data.levelTwoAnswers, 'D');  // Map Level 2 answers
-
-            // Save the updated workbook and let Excel recalculate when opened
-            const savedFilePath = await saveUpdatedWorkbook(workbook, profileId, token);
-
-            // 6. Extract the updated data from the saved file on the server
-            await extractDataFromSavedFile(savedFilePath, profileId, token);
-
-            // 7. Delete the file after extracting data
-            await deleteSavedFile(savedFilePath, token);
-
+            return response.data;  // Assuming the profile data includes name, age, and gender
         } catch (error) {
-            console.error('Error calculating score:', error.message || error);
+            console.error('Error fetching profile data:', error);
+            throw error;
         }
     };
 
-    // Function to clear all columns except column A
-    const clearAllExceptColumnA = (sheet) => {
-        const range = XLSX.utils.decode_range(sheet['!ref']);
-        
-        for (let R = range.s.r; R <= range.e.r; ++R) { // Loop over all rows
-            for (let C = range.s.c + 1; C <= range.e.c; ++C) { // Loop over all columns except column A (index 0)
-                const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
-                if (sheet[cellAddress]) {
-                    sheet[cellAddress].v = ''; // Clear the value of the cell
-                }
-            }
-        }
+    // Function to insert profile data and BMI into the sheet
+    const insertProfileDataIntoSheet = (sheet, profileData, bmi) => {
+        const { name, age, gender } = profileData;
+
+        // Insert profile data into specific rows/columns in the Excel sheet
+        sheet['B2'] = { v: name };  // Assuming Name goes into cell B2
+        sheet['B3'] = { v: age };   // Assuming Age goes into cell B3
+        sheet['B4'] = { v: gender }; // Assuming Gender goes into cell B4
+        sheet['B5'] = { v: bmi };   // Assuming BMI goes into cell B5 (fetched from levelOneAnswers)
+
+        // Adjust the cell references as per your actual Excel structure
     };
 
     // Function to map answers into Excel sheet columns
@@ -123,6 +74,52 @@ const CalculateScoreButton = ({ profileId }) => {
         }
     };
 
+    // Function to format extracted data into a proper object
+    const formatExtractedData = (data) => {
+        const formattedData = {};
+
+        data.forEach((item) => {
+            if (Array.isArray(item)) {
+                if (item.length === 2) {
+                    formattedData[item[0]] = item[1];
+                } else if (item.length > 2) {
+                    formattedData[item[0]] = item.slice(1);
+                }
+            }
+        });
+
+        return formattedData;
+    };
+
+    // Send the formatted data to the backend
+    const sendExtractedDataToBackend = async (data) => {
+        try {
+            const token = localStorage.getItem('token');
+
+            // Format the extracted data before sending it
+            const formattedData = formatExtractedData(data);
+
+            const requestData = {
+                profileId: profileId,  // Assuming profileId is available in the component
+                diagnosisData: formattedData  // Send the formatted data as an object
+            };
+
+            console.log("Sending formatted data to backend:", requestData);
+
+            const response = await axios.post('/api/diagnosis/save', requestData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            console.log('Diagnosis data successfully sent to the backend:', response.data);
+            setSubmissionSuccess(true);
+        } catch (error) {
+            console.error('Error submitting diagnosis data to backend:', error);
+            setError(error.message || error);
+        }
+    };
+
     // Send the updated workbook to the backend to save it as a file
     const saveUpdatedWorkbook = async (workbook, profileId, token) => {
         const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
@@ -151,31 +148,102 @@ const CalculateScoreButton = ({ profileId }) => {
         try {
             const response = await axios.get(`/api/files/extractData`, {
                 params: { filePath, profileId },
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             console.log('Extracted Data from Provisional Diagnosis:', response.data);
-            setDiagnosisData(response.data);  // Set the extracted data in state
+            return response.data;  // Return extracted data to be sent to the backend
         } catch (error) {
             console.error('Error extracting data from saved file:', error);
             throw error;
         }
     };
 
-    // Delete the saved file after extraction
+    // Delete the saved file after extraction and sending to backend
     const deleteSavedFile = async (filePath, token) => {
         try {
             await axios.delete(`/api/files/deleteFile`, {
                 params: { filePath },
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             console.log('File deleted from the server:', filePath);
         } catch (error) {
             console.error('Error deleting file from server:', error);
             throw error;
+        }
+    };
+
+    // Main function that handles everything
+    const calculateScore = async () => {
+        try {
+            const token = localStorage.getItem('token');
+
+            // 1. Fetch profile data (name, age, gender) by profileId
+            const profileData = await fetchProfileData(profileId, token);
+            console.log('Profile Data:', profileData);
+
+            // 2. Fetch the answers for the profileId, including BMI
+            const response = await axios.get(`/api/assessment-summary/${profileId}/answers`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.status === 404) {
+                console.error('Answers not found for the given profile ID.');
+                return;
+            }
+
+            const data = response.data;
+            console.log('Assessment Summary:', data);
+
+            // 3. Extract BMI from levelOneAnswers
+            const bmi = data.levelOneAnswers.BMI || 0; // Assuming BMI is in levelOneAnswers
+            console.log('BMI:', bmi);
+
+            // 4. Fetch the Excel file from the server
+            const fileResponse = await fetch('/Excel/Lotus Algorithm Simulator_18092024.xlsx');
+            
+            if (!fileResponse.ok) {
+                throw new Error('Failed to fetch Excel file. Please check the file path.');
+            }
+
+            const arrayBuffer = await fileResponse.arrayBuffer();
+
+            // 5. Parse the file as a workbook
+            let workbook;
+            try {
+                workbook = XLSX.read(arrayBuffer, { type: 'array' });
+            } catch (error) {
+                throw new Error('Failed to parse Excel file.');
+            }
+
+            // 6. Access and clear "Provisional Diagnosis" sheet except column A
+            const diagnosisSheet = workbook.Sheets['Provisional Diagnosis'];
+            if (!diagnosisSheet) {
+                throw new Error('Provisional Diagnosis sheet not found.');
+            }
+
+            // 7. Insert profile data and BMI into the sheet
+            insertProfileDataIntoSheet(diagnosisSheet, profileData, bmi);
+
+            // 8. Clear and map answers to the "Response" sheet
+            const responseSheet = workbook.Sheets['Response'];
+            clearColumn(responseSheet, 'D');
+            mapAnswersToSheet(responseSheet, data.levelOneAnswers, 'D');
+            mapAnswersToSheet(responseSheet, data.levelTwoAnswers, 'D');
+
+            // 9. Save the updated workbook
+            const savedFilePath = await saveUpdatedWorkbook(workbook, profileId, token);
+
+            // 10. Extract the updated data from the saved file
+            const extractedData = await extractDataFromSavedFile(savedFilePath, profileId, token);
+
+            // 11. Send the extracted data to the backend
+            await sendExtractedDataToBackend(extractedData);
+
+            // 12. Delete the file from the server after sending the data
+            await deleteSavedFile(savedFilePath, token);
+
+        } catch (error) {
+            console.error('Error calculating score:', error.message || error);
         }
     };
 
@@ -188,7 +256,9 @@ const CalculateScoreButton = ({ profileId }) => {
                     <pre>{JSON.stringify(diagnosisData, null, 2)}</pre>  {/* Render extracted data */}
                 </div>
             )}
-            </div>
+            {submissionSuccess && <p>Data successfully submitted to the backend!</p>}
+            {error && <p>Error: {error}</p>}
+        </div>
     );
 };
 

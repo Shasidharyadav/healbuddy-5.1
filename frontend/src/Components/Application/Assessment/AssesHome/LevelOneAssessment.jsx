@@ -428,6 +428,8 @@ const LevelOneAssessment = ({ onContinue, profileName }) => {
                                         <button onClick={() => handleNext('L010900', 'L010801', 'Pain increases during any movement like bending forward/backwards, walking, etc.')}>Pain increases during any movement like bending forward/backwards, walking, etc.</button>
                                         <button onClick={() => handleNext('L010900', 'L010801', 'Pain increases in sedentary postures like continuous sitting/standing/lying down')}>Pain increases in sedentary postures like continuous sitting/standing/lying down</button>
                                         <button onClick={() => handleNext('L010900', 'L010801', 'There is no relief even after a change in posture/activity')}>There is no relief even after a change in posture/activity</button>
+                                        <button onClick={() => handleNext('L010900', 'L010801', 'Difficulty in control of bowel and bladder')}>Difficulty in control of bowel and bladder</button>
+                                        <button onClick={() => handleNext('L010900', 'L010801', 'Stiffness in muscles or loss of flexibility')}>Stiffness in muscles or loss of flexibility</button>
                                     </div>
                                     <div className="options">
                                         {isEditing ? (
@@ -527,8 +529,11 @@ const LevelOneAssessment = ({ onContinue, profileName }) => {
                                             handleNextFollowUp('L011101', 'Currently pregnant');
                                         }}>Currently pregnant</button>
                                         <button onClick={() => {
-                                            handleNextFollowUp('L011101', 'Child is 1 year old');
-                                        }}>Child is 1 year old</button>
+                                            handleNextFollowUp('L011101', 'Child is currently younger than 1 year old');
+                                        }}>Child is currently younger than 1 year old</button>
+                                        <button onClick={() => {
+                                            handleNextFollowUp('L011101', 'Child is more than 1 year old');
+                                        }}>Child is more than 1 year old</button>
                                     </div>
                                     <div className="options">
                                         <button onClick={() => handlePrevious()}>Previous</button>
@@ -580,6 +585,9 @@ const LevelOneAssessment = ({ onContinue, profileName }) => {
                                         <button onClick={() => {
                                             handleNextFollowUp('L011130', 'Active for more than a year');
                                         }}>Active for more than a year</button>
+                                        <button onClick={() => {
+                                            handleNextFollowUp('L011130', 'Not Active');
+                                        }}>Not Active</button>
                                     </div>
                                     <div className="options">
                                         <button onClick={() => handlePrevious()}>Previous</button>
@@ -597,6 +605,9 @@ const LevelOneAssessment = ({ onContinue, profileName }) => {
                                         <button onClick={() => {
                                             handleNextFollowUp('L011140', 'Detected before the previous year');
                                         }}>Detected before the previous year</button>
+                                        <button onClick={() => {
+                                            handleNextFollowUp('L011140', 'Not Active');
+                                        }}>Not Active</button>
                                     </div>
                                     <div className="options">
                                         <button onClick={() => handlePrevious()}>Previous</button>
